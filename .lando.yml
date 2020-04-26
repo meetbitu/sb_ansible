@@ -1,0 +1,4 @@
+name: social-buying-ansible
+services:
+  ansible:
+    type: python:3.7

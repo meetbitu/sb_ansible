@@ -1,1 +1,1 @@
-# sb_ansible
+# Server infrastructure code
