@@ -6,6 +6,8 @@
 - `terraform init`
 - `terraform plan`
 - `terraform apply`
+- This bug is blocking the use of terraform-inventory from automatically picking up server info from terraform: https://github.com/adammck/terraform-inventory/issues/131
+- Until then you can edit the `ansible_hosts.txt` file then use the custom lando command `ansible-playbook-apply`
 
 ## Commands
 

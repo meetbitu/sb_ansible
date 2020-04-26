@@ -15,6 +15,9 @@ services:
       - unzip terraform-inventory_0.9_linux_amd64.zip
       - mv terraform-inventory /usr/bin/
       - rm terraform-inventory_0.9_linux_amd64.zip
+    overrides:
+      environment:
+        TF_STATE: .
 tooling:
   ansible:
     service: infra
@@ -26,6 +29,12 @@ tooling:
     description: "Terraform"
     cmd:
       - /usr/bin/ansible-playbook -i terraform-inventory
+  ansible-playbook-apply:
+    service: infra
+    description: "Terraform"
+    cmd:
+      - /usr/bin/ansible-playbook setup_ubuntu1804/playbook.yml -u root -i ansible_hosts.txt
+      # - /usr/bin/ansible-playbook setup_ubuntu1804/playbook.yml -u root -i terraform-inventory
   terraform:
     service: infra
     description: "Terraform"
