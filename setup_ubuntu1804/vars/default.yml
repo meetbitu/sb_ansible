@@ -1,0 +1,4 @@
+---
+create_user: bitu
+copy_local_key: "{{ lookup('file', '/user/.ssh/id_rsa.pub') }}"
+sys_packages: [ 'curl', 'vim', 'git', 'ufw']

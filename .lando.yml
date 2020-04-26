@@ -20,7 +20,12 @@ tooling:
     service: infra
     description: "Ansible"
     cmd:
-      - /usr/bin/ansible
+      - /usr/bin/ansible -i terraform-inventory
+  ansible-playbook:
+    service: infra
+    description: "Terraform"
+    cmd:
+      - /usr/bin/ansible-playbook -i terraform-inventory
   terraform:
     service: infra
     description: "Terraform"
