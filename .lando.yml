@@ -33,8 +33,8 @@ tooling:
     service: infra
     description: "Terraform"
     cmd:
-      # - /usr/bin/ansible-playbook setup_ubuntu1804/playbook.yml -u root -i ansible_hosts.txt
-      - /usr/bin/ansible-playbook setup_ubuntu1804/playbook.yml -u root -i /usr/bin/terraform-inventory
+      # - /usr/bin/ansible-playbook ansible/playbook.yml -u root -i ansible_hosts.txt
+      - /usr/bin/ansible-playbook ansible/playbook.yml -u root -i /usr/bin/terraform-inventory
   terraform:
     service: infra
     description: "Terraform"
