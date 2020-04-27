@@ -1,5 +1,5 @@
 #################################################
-# DO Community Playbooks: Initial Server Setup
+# Ansible Playbook
 #################################################
 ---
 - hosts: all
@@ -8,10 +8,24 @@
     - vars/default.yml
 
   tasks:
+    # Run some node install steps first so that they get included in the install step below
+    # nodejs has also been added to the default.yml sys_packages variable
+    # Prevent warning about using uri module since this is the offical install recommendation
+    - name: Download and run node installer
+      shell: curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+      args:
+        warn: false
+
+    ##
+    # DO Community Playbooks: Initial Server Setup
+    #
+    # https://www.digitalocean.com/community/tutorials/how-to-use-ansible-to-automate-initial-server-setup-on-ubuntu-18-04
+    # https://github.com/do-community/ansible-playbooks
+    ##
     - name: Install Prerequisites
       apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
 
-# Sudo Group Setup
+    # Sudo Group Setup
     - name: Make sure we have a 'wheel' group
       group:
         name: wheel
@@ -25,7 +39,7 @@
         line: '%wheel ALL=(ALL) NOPASSWD: ALL'
         validate: '/usr/sbin/visudo -cf %s'
 
-# User + Key Setup
+    # User + Key Setup
     - name: Create a new regular user with sudo privileges
       user:
         name: "{{ create_user }}"
@@ -48,14 +62,14 @@
         regexp: '^#?PermitRootLogin'
         line: 'PermitRootLogin prohibit-password'
 
-# Install Packages
+    # Install Packages
     - name: Update apt
       apt: update_cache=yes
 
     - name: Install required system packages
       apt: name={{ sys_packages }} state=latest
 
-# UFW Setup
+    # UFW Setup
     - name: UFW - Allow SSH connections
       ufw:
         rule: allow
@@ -66,3 +80,35 @@
         state: enabled
         policy: deny
         direction: incoming
+
+    ##
+    # NGINX
+    #
+    # http://www.andrekolell.de/blog/terraform-ansible-nodejs-google-compute-engine
+    ##
+    - name: NGINX | Overwrite /etc/nginx/conf.d/default.conf
+        template: src=templates/nginx-default.conf dest=/etc/nginx/conf.d/default.conf owner=root group=root mode=0644
+
+      - name: NGINX | Restart NGINX
+        service:
+          name: nginx
+          state: restarted
+
+    ##
+    # DO Community Playbooks: Initial Server Setup
+    #
+    # @TODO: Node app server setup
+    # https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-18-04
+    ##
+    # - name: Create directory for app
+    #   file:
+    #     path: /var/www/sb_api
+    #     state: directory
+    - git:
+        repo: 'https://github.com/meetbitu/sb_api.git'
+        dest: /var/www/sb_api
+
+    - name: Install PM2
+      npm:
+        name: pm2
+        global: yes
