@@ -87,7 +87,12 @@
     # http://www.andrekolell.de/blog/terraform-ansible-nodejs-google-compute-engine
     ##
     - name: NGINX | Overwrite /etc/nginx/conf.d/default.conf
-        template: src=templates/nginx-default.conf dest=/etc/nginx/conf.d/default.conf owner=root group=root mode=0644
+      template:
+        src: templates/nginx-default.conf
+        dest: /etc/nginx/conf.d/default.conf
+        owner: root
+        group: root
+        mode: '0644'
 
     - name: NGINX | Restart NGINX
       service:
