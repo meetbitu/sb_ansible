@@ -70,16 +70,20 @@
       apt: name={{ sys_packages }} state=latest
 
     # UFW Setup
+    # - name: UFW - Allow SSH connections
+    #   ufw:
+    #     rule: allow
+    #     name: OpenSSH
     - name: UFW - Allow SSH connections
       ufw:
         rule: allow
-        name: OpenSSH
+        name: Nginx HTTP
 
-    - name: UFW - Deny all other incoming traffic by default
-      ufw:
-        state: enabled
-        policy: deny
-        direction: incoming
+    # - name: UFW - Deny all other incoming traffic by default
+    #   ufw:
+    #     state: enabled
+    #     policy: deny
+    #     direction: incoming
 
     ##
     # NGINX
@@ -113,7 +117,16 @@
         repo: 'https://github.com/meetbitu/sb_api.git'
         dest: /var/www/sb_api
 
+    - name: Update packages based on package.json to their latest version.
+      npm:
+        path: /var/www/sb_api
+
     - name: Install PM2
       npm:
         name: pm2
         global: yes
+
+    - name: Start app
+      command: "pm2 start ecosystem.json --env production"
+      args:
+        chdir: /var/www/sb_api
