@@ -2,7 +2,7 @@
 # Ansible Playbook
 #################################################
 ---
-- hosts: all
+- hosts: sb_api_01
   become: true
   vars_files:
     - vars/default.yml
@@ -109,17 +109,33 @@
     # @TODO: Node app server setup
     # https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-18-04
     ##
-    # - name: Create directory for app
-    #   file:
-    #     path: /var/www/sb_api
-    #     state: directory
     - git:
         repo: 'https://github.com/meetbitu/sb_api.git'
         dest: /var/www/sb_api
+        accept_hostkey: yes
+      become: no
+
+    - name: Set ownership of app directory
+      file:
+        path: /var/www/sb_api
+        state: directory
+        recurse: yes
+        owner: bitu
+        group: bitu
+
+    # This will change when an external database comes into effect
+    - name: Set up blank production config file
+      template:
+        src: templates/production.json
+        dest: /var/www/sb_api/config/production.json
+        owner: "{{ create_user }}"
+        group: "{{ create_user }}"
+        mode: u=rw,g=r,o=r
 
     - name: Update packages based on package.json to their latest version.
       npm:
         path: /var/www/sb_api
+        state: latest
 
     - name: Install PM2
       npm:
@@ -130,3 +146,4 @@
       command: "pm2 start ecosystem.json --env production"
       args:
         chdir: /var/www/sb_api
+      become: no
