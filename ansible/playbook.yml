@@ -70,20 +70,21 @@
       apt: name={{ sys_packages }} state=latest
 
     # UFW Setup
-    # - name: UFW - Allow SSH connections
-    #   ufw:
-    #     rule: allow
-    #     name: OpenSSH
     - name: UFW - Allow SSH connections
+      ufw:
+        rule: allow
+        name: OpenSSH
+    # @TODO REmove this once we have a domain and acme set up
+    - name: UFW - Allow HTTP for now until we get a domain sorted
       ufw:
         rule: allow
         name: Nginx HTTP
 
-    # - name: UFW - Deny all other incoming traffic by default
-    #   ufw:
-    #     state: enabled
-    #     policy: deny
-    #     direction: incoming
+    - name: UFW - Deny all other incoming traffic by default
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
 
     ##
     # NGINX
@@ -137,6 +138,25 @@
         path: /var/www/sb_api
         state: latest
 
+    # Set up client app
+    - name: Create directory for client app
+      file:
+        path: /var/www/sb_web_client
+        state: directory
+        recurse: yes
+        owner: bitu
+        group: bitu
+
+    - name: Print message to admin if this is a new server and the web client needs to be synced
+      command: ls /var/www/sb_web_client
+      register: web_client_ls
+
+    - name: check contents for emptiness
+      debug:
+        msg: "WARNING: The sb_web_client build must be manually synced to this server"
+      when: web_client_ls.stdout == ""
+
+    # Start API app
     - name: Install PM2
       npm:
         name: pm2
