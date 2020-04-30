@@ -167,3 +167,10 @@
       args:
         chdir: /var/www/sb_api
       become: no
+
+
+    # Certificate
+    # https://www.digitalocean.com/community/tutorials/how-to-acquire-a-let-s-encrypt-certificate-using-ansible-on-ubuntu-18-04
+    # https://docs.ansible.com/ansible/latest/modules/acme_certificate_module.html#acme-certificate-module
+    # https://medium.com/@khandelwal12nidhi/automate-letsencrypt-ssl-installation-with-ansible-for-multiple-domains-8453f2c3212d
+    # ?? https://github.com/geerlingguy/ansible-role-certbot
