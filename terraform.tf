@@ -14,7 +14,7 @@ resource "digitalocean_floating_ip" "sb_api_ip" {
   region = "sgp1"
 }
 
-resource "digitalocean_droplet" "sb_api_01" {
+resource "digitalocean_droplet" "sb_api_a" {
   image  = "ubuntu-18-04-x64"
   name   = "sb-api-01"
   region = "sgp1"
@@ -25,5 +25,5 @@ resource "digitalocean_droplet" "sb_api_01" {
 
 resource "digitalocean_floating_ip_assignment" "sb_api_ip_assingment" {
   ip_address = digitalocean_floating_ip.sb_api_ip.ip_address
-  droplet_id = digitalocean_droplet.sb_api_01.id
+  droplet_id = digitalocean_droplet.sb_api_a.id
 }

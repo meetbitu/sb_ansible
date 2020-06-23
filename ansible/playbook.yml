@@ -2,7 +2,7 @@
 # Ansible Playbook
 #################################################
 ---
-- hosts: sb_api_01
+- hosts: sb_api_a
   become: true
   vars_files:
     - vars/default.yml
@@ -133,10 +133,10 @@
         group: "{{ create_user }}"
         mode: u=rw,g=r,o=r
 
-    - name: Update packages based on package.json to their latest version.
-      npm:
-        path: /var/www/sb_api
-        state: latest
+    # - name: Update packages based on package.json to their latest version.
+    #   npm:
+    #     path: /var/www/sb_api
+    #     state: latest
 
     # Set up client app
     - name: Create directory for client app
@@ -153,8 +153,26 @@
 
     - name: check contents for emptiness
       debug:
-        msg: "WARNING: The sb_web_client build must be manually synced to this server"
+        msg: "WARNING: The sb_web_client build must be manually synced to this server. Something like: rsync -avz --delete -e 'ssh -o StrictHostKeyChecking=no' build/* bitu@x.x.x.x:/var/www/sb_web_client"
       when: web_client_ls.stdout == ""
+
+    # Set up temp electric dir
+    - name: Create directory for client app
+      file:
+        path: /var/www/electric
+        state: directory
+        recurse: yes
+        owner: bitu
+        group: bitu
+
+    - name: Print message to admin if this is a new server and the web client needs to be synced
+      command: ls /var/www/electric
+      register: electric_ls
+
+    - name: check contents for emptiness
+      debug:
+        msg: "WARNING: The electric files must be manually synced to this server. Something like: rsync -avz --delete -e 'ssh -o StrictHostKeyChecking=no' ./* bitu@x.x.x.x:/var/www/electric"
+      when: electric_ls.stdout == ""
 
     # Start API app
     - name: Install PM2
@@ -170,6 +188,7 @@
 
 
     # Certificate
+    # Do this through a load balancer instead and we don't have to worry about each server
     # https://www.digitalocean.com/community/tutorials/how-to-acquire-a-let-s-encrypt-certificate-using-ansible-on-ubuntu-18-04
     # https://docs.ansible.com/ansible/latest/modules/acme_certificate_module.html#acme-certificate-module
     # https://medium.com/@khandelwal12nidhi/automate-letsencrypt-ssl-installation-with-ansible-for-multiple-domains-8453f2c3212d
